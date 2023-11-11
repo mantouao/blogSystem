@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 999;
+        background-color: #fff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .navbar-brand img {
+        max-height: 40px;
+        border-radius: 50%;
+    }
+
+    .navbar-nav .nav-link {
+        color: #333;
+        font-weight: bold;
+        margin-left: 20px;
+    }
+
+    .navbar-nav .nav-link:hover {
+        color: #0f9ae0;
+    }
+
+    .content {
+        margin-top: 70px; /* 调整页面内容的上边距，以避免导航栏遮挡内容 */
+        padding: 20px;
+    }
+</style>
+<body>
+<!--导航栏-->
+<nav class="navbar navbar-expand-lg navbar-light"  style="background-image: url('/img/bj.jpg');background-color: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);" th:fragment="topbar">
+    <div class="container">
+        <a class="navbar-brand " th:href="@{/user/toIndex}">
+            <img style="border: black 2px;border-radius: 20px;width: 20%;height: 20%" src="/img/touxiang.png" alt="头像">
+        </a>
+        <div shiro:authenticated style="position: absolute;float: left;left: 250px;color: burlywood;font-weight: inherit">
+            <p>用户: <a style="text-decoration: none;color: #ffe69c" th:href="@{/user/toIndex}" onmouseover="this.style.color='orange'" onmouseout="this.style.color='#ffe69c'"><span shiro:principal property="username"/></a> 您好</p>
+        </div>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <span style="text-align: center;font-size: 30px">☆博客猿☆</span>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item" shiro:authenticated>
+                    <a type="button" class="nav-link btn btn-outline-danger" style="color: #adb5bd" th:href="@{/logout}">注销</a>
+                </li>
+                <li class="nav-item"shiro:notAuthenticated>
+                    <a class="nav-link" style="color: #F8E71C" onmouseover="this.style.color='orange'" onmouseout="this.style.color='#F8E71C'" th:href="@{/login}">登录</a>
+                </li>
+                <li class="nav-item" shiro:hasPermission="ROLE_admin">
+                    <a class="nav-link" style="color: #F8E71C" onmouseover="this.style.color='orange'" onmouseout="this.style.color='#F8E71C'" th:href="@{/admin/toUserM}">后台登录</a>
+                </li>
+
+            </ul>
+            <form class="d-flex" th:action="@{/select}">
+                <input name="title" class="form-control form-control-sm me-2" style="width: 200px; font-size: 12px;" type="search" placeholder="搜索(内容为空时显示全部信息)" aria-label="搜索">
+                <button class="btn btn-outline-success btn-sm" type="submit">搜索</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+
+
+</body>
+</html>

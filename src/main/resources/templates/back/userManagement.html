@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="title='首页', active='user'">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理中心</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+        body{
+            background-image: url('/img/bj.jpg');
+        }
+        a{
+            color: #c7dbd2;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+        a:hover{
+            color: orange;
+        }
+        .odd-row {
+            color: #e6dbb9;
+            background-color: rgba(128, 128, 128, 0.3);
+        }
+
+        .even-row {
+            color: #ffe69c;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="back/common::header(title=${title},active=${active})"></div>
+
+
+<main class="container mt-5">
+    <div class="content-page">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="page-title" style="color: #dfc2c4;">用户管理</h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body">
+                                <span class="card-icon"><i class="fa fa-quote-right" aria-hidden="true"></i></span>
+                                <div class="card-info text-right">
+                                    一共注册了<span style="color: #bfe2e9;" class="counter" th:text="${userCount}"></span>个用户
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body">
+                                <span class="card-icon"><i class="fa fa-comments-o" aria-hidden="true"></i></span>
+                                <div class="card-info text-right">
+                                    一共注册<span style="color: #bfe2e9;" class="counter" th:text="${adminCount}"></span>管理员
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card" style="background: rgba(0,0,0,0.3)">
+                            <div class="card-header">
+                                <h4 class="card-title" style="color: #dfc2c4;">用户中心</h4>
+                            </div>
+                            <div class="card-body">
+                                <table class="table" style="background: rgba(0,0,0,0.3)">
+                                    <thead style="color: #dfc2c4;">
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>创建时间</th>
+                                        <th>邮箱</th>
+                                        <th>权限</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- 使用Thymeleaf循环遍历用户数据并生成表格行 -->
+                                    <tr th:each="user, rowStatus : ${userList}" th:class="${rowStatus.even}? 'even-row' : 'odd-row'">
+                                        <td th:text="${user.username}"></td>
+                                        <td th:text="${commons.dateFormat(user.created)}"></td>
+                                        <td th:text="${user.email}"></td>
+                                        <td th:text="${user.authority}"></td>
+                                        <td>
+                                            <a class="btn btn-danger" href="javascript:void(0)" th:onclick="delUser([[${user.id}]],[[${user.username}]])">删除</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card" style="background: rgba(0,0,0,0.5)">
+                            <div class="card-header">
+                                <h4 class="card-title" style="color: #dfc2c4;">管理员中心</h4>
+                            </div>
+                            <div class="card-body">
+                                <table class="table" style="background: rgba(0,0,0,0.3)">
+                                    <thead style="color: #dfc2c4;">
+                                    <tr>
+                                        <th>用户名</th>
+                                        <th>创建时间</th>
+                                        <th>邮箱</th>
+                                        <th>权限</th>
+                                        <th>操作</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <!-- 使用Thymeleaf循环遍历用户数据并生成表格行 -->
+                                    <tr th:each="admin, rowStatus : ${adminList}" th:class="${rowStatus.even}? 'even-row' : 'odd-row'">
+                                        <td th:text="${admin.username}"></td>
+                                        <td th:text="${commons.dateFormat(admin.created)}"></td>
+                                        <td th:text="${admin.email}"></td>
+                                        <td th:text="${admin.authority}"></td>
+                                        <td>
+                                            <a class="btn btn-danger" href="javascript:void(0)" th:onclick="delUser([[${admin.id}]],[[${admin.username}]])">删除</a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="back/common::footer"></div>
+
+<script>
+    function delUser(id,username) {
+        console.log(id)
+        console.log(username)
+        if (confirm('确定删除该用户吗?')) {
+            $.ajax({
+                type: 'post',
+                url: '/admin/delete',
+                data: {id: id,username: username},
+                dataType: 'json',
+                success: function (result) {
+                    if (result && result.success) {
+                        window.alert("删除成功");
+                        window.location.reload();
+                    } else {
+                        window.alert(result.msg || '删除失败');
+                    }
+                }
+            });
+        }
+    }
+</script>
+<script src="/js/bootstrap.bundle.js"></script>
+<script src="/js/jquery.min.js"></script>
+</body>
+</html>

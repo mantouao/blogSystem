@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap Template</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+</head>
+<body>
+<div  id="comments" th:fragment="comments">
+    <div th:if="${article!=null}">
+<!--        写评论-->
+        <div th:if="${article.allowComment}">
+            <div class="container" style="width: 900px;height: 250px;margin-top: 50px">
+                <form  id="comment-form" class="comment-form" role="form" onsubmit="return TaleComment.subComment();">
+                    <div class="form-group">
+                        <input type="hidden" name="aid" id="aid" th:value="${article.id}"/>
+                    </div>
+                    <div class="form-group">
+                        <label for="textarea">输入评论内容</label>
+                        <textarea style="height: 150px" name="text" id="textarea" class="form-control" placeholder="评论不能为空哦!"
+                                  required="required" minlength="5" maxlength="2000"></textarea>
+                    </div>
+                    <button style="float: right" type="submit" class="btn btn-primary">提交</button>
+                </form>
+                <hr>
+            </div>
+        </div>
+<!--        评论的展示-->
+        <div th:if="${comments}" class="container">
+            <ol class="comment-list">
+                <th:block th:each="comment :${comments.list}">
+                    <hr>
+                    <li th:id="'li-comment-'+${comment.id}" class="comment-body comment-parent comment-odd" style="margin-left: 180px">
+                        <div th:id="'comment-'+${comment.id}" class="comment-view" onclick="">
+                            <div class="comment-header">
+                                <!-- 设置人物头像和名称 -->
+                                <img class="avatar" th:src="@{/img/touxiang.png}" height="40" />
+                                <a style="text-decoration: none;color: #c1d6cc;font-weight: bold" class="comment-author" rel="external nofollow" th:text="${comment.author}"></a>
+                            </div>
+                            <!-- 评论内容 -->
+                            <div class="comment-content">
+                                <span class="comment-author-at"></span>
+                                <p th:utext="${commons.article(comment.content)}"></p>
+                            </div>
+                            <!-- 评论日期 -->
+                            <div class="comment-meta">
+                                <time class="comment-time" th:text="${commons.dateFormat(comment.created)}"></time>
+<!--                                <a th:if="${comment.author}!= ${username}" th:href="'?reply=' + ${comment.author}+'#comment-form'" style="color: #1b961b;text-decoration: none;" onclick="addMention()">-->
+<!--                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;回复-->
+<!--                                </a>-->
+                                <a th:if="${comment.author}!= ${username}" th:href="'#comment-form'" style="color: #1b961b;text-decoration: none;" th:onclick="addMention([[${comment.author}]])" >
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;回复
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    <hr>
+                </th:block>
+            </ol>
+
+            <!--         进行评论分页-->
+            <nav aria-label="...">
+                <ul class="pagination justify-content-center">
+                    <!--                    如果有前一页-->
+                    <th:block th:if="${comments.hasPreviousPage}">
+                        <li class="page-item">
+                            <a class="page-link" th:href="'?cp='+${comments.prePage}+'#comments'" aria-label="Previous" style="background-color: #333;">
+                                <span aria-hidden="true">&laquo;</span>
+<!--                                <span class="sr-only">Previous</span>-->
+                            </a>
+                        </li>
+                    </th:block>
+                    <!--                    没有前一页-->
+                    <th:block th:unless="${comments.hasPreviousPage}">
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous" style="background-color: #333;">
+                                <span aria-hidden="true">&laquo;</span>
+<!--                                <span class="sr-only">Previous</span>-->
+                            </span>
+                        </li>
+                    </th:block>
+
+                    <th:block th:each="pageNum:${comments.navigatepageNums}">
+                        <th:block th:if="${comments.pages}<=5">
+                            <li th:class="${comments.pageNum}==${pageNum}?'active':''" >
+                                <a style="background-color: #333;" class="page-link" th:href="'?cp='+${pageNum}+'#comments'" th:text="${pageNum}"></a>
+                            </li>
+                        </th:block>
+                        <th:block th:if="${comments.pages}>5">
+                            <li th:if="${comments.pageNum<=3 && pageNum<=5}" th:class="${comments.pageNum}==${pageNum}?'active':''">
+                                <a style="background-color: #333;" class="page-link" th:href="'?cp='+${pageNum}+'#comments'" th:text="${pageNum}"></a>
+                            </li>
+                            <li th:if="${comments.pageNum >= comments.pages-2 && pageNum > comments.pages-5}" th:class="${comments.pageNum}==${pageNum}?'active':''">
+                                <a style="background-color: #333;" class="page-link" th:href="'?cp='+${pageNum}+'#comments'" th:text="${pageNum}"></a>
+                            </li>
+                            <li th:if="${comments.pageNum >=4 && comments.pageNum <= comments.pages-3 &&  pageNum >= comments.pageNum-2 && pageNum <= comments.pageNum+2}"  th:class="${comments.pageNum}==${pageNum}?'active':''">
+                                <a style="background-color: #333;" class="page-link" th:href="'?cp='+${pageNum}+'#comments'" th:text="${pageNum}"></a>
+                            </li>
+                        </th:block>
+                    </th:block>
+
+
+                    <th:block th:if="${comments.hasNextPage}">
+                        <li class="page-item">
+                            <a class="page-link" th:href="'?cp='+${comments.nextPage}+'#comments'" aria-label="Next" style="background-color: #333;">
+                                <span aria-hidden="true">&raquo;</span>
+<!--                                <span class="sr-only">Next</span>-->
+                            </a>
+                        </li>
+                    </th:block>
+                    <th:block th:unless="${comments.hasNextPage}">
+                        <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next" style="background-color: #333;">
+                                <span aria-hidden="true">&raquo;</span>
+<!--                                <span class="sr-only">Next</span>-->
+                            </span>
+                        </li>
+                    </th:block>
+                </ul>
+            </nav>
+
+        </div>
+    </div>
+</div>
+</body>
+</html>

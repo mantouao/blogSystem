@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="title='发布文章', active='articleReady'">
+<head>
+    <meta charset="UTF-8">
+    <title>文章</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-image: url('/img/bj.jpg');
+        }
+
+        a {
+            color: #c7dbd2;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: orange;
+        }
+
+        .custom-scroll {
+            height: 300px;
+            overflow: auto;
+        }
+    </style>
+</head>
+<body>
+<script src="/js/jquery.min.js"></script>
+<div th:replace="user/common::header(title=${title},active=${active})"></div>
+
+<div class="container">
+    <div class="row" style="margin-top: 65px">
+        <div class="col-md-12">
+            <h4 class="page-title" style="color: #dfc2c4;">
+                <th:block th:if="${null != contents}">
+                    编辑文章
+                </th:block>
+                <th:block th:unless="${null != contents}">
+                    发布文章
+                </th:block>
+            </h4>
+        </div>
+        <br>
+        <div class="col-md-12">
+            <form id="articleForm">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <input type="hidden" name="id"
+                                   th:value="${contents!=null and contents.id!=null}?${contents.id}: ''" id="id"/>
+                            <label for="title" style="color: #ffe69c">文章标题:</label>
+                            <input type="text" class="form-control" id="title" name="title"
+                                   style="background: rgba(255,255,255,0.5)"
+                                   th:value="${contents!=null and contents.getTitle()!=null}?${contents.getTitle()}: ''">
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="tags" style="color: #ffe69c">文章标签:</label>
+                            <input type="text" class="form-control" id="tags" name="tags"
+                                   style="background: rgba(255,255,255,0.5)"
+                                   th:value="${contents!=null and contents.getTags()!=null}?${contents.getTags()}: ''">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="categories" style="color: #ffe69c">文章分类:</label>
+                            <select class="form-control" id="categories" name="categories"
+                                    style="background: rgba(255, 255, 255, 0.5)">
+                                <option th:selected="${contents != null and contents.getCategories() != null and contents.getCategories() == '默认分类'}"
+                                        value="默认分类">默认分类
+                                </option>
+                                <option th:selected="${contents != null and contents.getCategories() != null and contents.getCategories() == '前端'}"
+                                        value="前端">前端
+                                </option>
+                                <option th:selected="${contents != null and contents.getCategories() != null and contents.getCategories() == '后端'}"
+                                        value="后端">后端
+                                </option>
+                                <option th:selected="${contents != null and contents.getCategories() != null and contents.getCategories() == '其他'}"
+                                        value="其他">其他
+                                </option>
+                                <!-- 添加更多选项 -->
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group" style="margin-top: 30px">
+                            <label style="color: #ffe69c">是否允许评论:</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="allowComment" id="allowCommentYes"
+                                       value="true"
+                                       th:checked="${contents !=null and contents.getAllowComment()!=null}?${contents.getAllowComment() == true} : true">
+                                <label class="form-check-label" for="allowCommentYes" style="color: #cfe2ff">是</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="allowComment" id="allowCommentNo"
+                                       value="false"
+                                       th:checked="${contents !=null and contents.getAllowComment()!=null}?${contents.getAllowComment() == false} : false">
+                                <label class="form-check-label" for="allowCommentNo" style="color: #cfe2ff">否</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="content" style="color: #ffe69c">文章内容:</label>
+                    <textarea class="form-control  custom-scroll" id="content" name="content" rows="8"
+                              style="resize: none;background: rgba(255,255,255,0.5)"
+                              th:text="${contents!=null and contents.getContent()!=null}?${contents.getContent()}: ''"></textarea>
+                </div>
+
+                <button type="button" class="btn btn-primary" style="color: #ffe69c;margin-left: 1200px"
+                        onclick="saveArticle()">保存文章
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="user/common::footer"></div>
+
+
+<script>
+    function saveArticle() {
+        var id = document.getElementById("id").value
+        var url = (id === '') ? '/user/publish' : '/user/update'
+        var formData = $('#articleForm').serialize();
+        $.ajax({
+            url: url,
+            type: 'post',
+            data: formData,
+            success: function (result) {
+                var data = $.parseJSON(result)
+                if (data && data.success) {
+                    window.alert("文章保存成功");
+                    window.location.replace('/user/toArticleM?page=1&count=10');
+                } else {
+                    window.alert(result.msg || '文章保存失败');
+                }
+            },
+            error: function (result) {
+                window.alert(result.msg || '文章保存失败');
+            }
+        });
+    }
+</script>
+<script src="/js/bootstrap.bundle.js"></script>
+</body>
+</html>

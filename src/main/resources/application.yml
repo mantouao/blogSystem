@@ -1,0 +1,25 @@
+server:
+  port: 8080
+spring:
+  profiles:
+    active: jdbc,redis,mail
+  thymeleaf:
+    cache: false
+  messages:
+    basename: i18n.login
+  mvc:
+    static-path-pattern: /**
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com/wang/blog_system/model/pojo
+
+pagehelper:
+  helper-dialect: mysql
+  reasonable: true
+  support-methods-arguments: true
+  params: count=countSql
+#cookie:
+#  validity: 1800
+

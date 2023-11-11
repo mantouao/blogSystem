@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="title='评论管理',active='comment'">
+<head>
+    <meta charset="UTF-8">
+    <title>评论管理</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-image: url('/img/bj.jpg');
+        }
+
+        a {
+            color: #c7dbd2;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: orange;
+        }
+
+        .odd-row {
+            color: #e6dbb9;
+            background-color: rgba(128, 128, 128, 0.3);
+        }
+
+        .even-row {
+            color: #ffe69c;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+<div th:replace="back/common::header(title=${title},active=${active})"></div>
+
+
+<main class="container mt-5">
+    <div class="col-sm-12">
+        <h4 class="page-title" style="color: #dfc2c4;">评论管理</h4>
+    </div>
+
+    <table class="table" style="background: rgba(0,0,0,0.3)">
+        <thead style="color: #dfc2c4;">
+        <tr>
+            <th>文章标题</th>
+            <th>发布时间</th>
+            <th>ip</th>
+            <th>评论</th>
+            <th>作者</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 使用Thymeleaf循环遍历文章数据并生成表格行 -->
+        <tr th:each="comment, rowStatus : ${comments.list}" th:class="${rowStatus.even}? 'even-row' : 'odd-row'">
+            <td th:text="${comment.title}"></td>
+            <td th:text="${commons.dateFormat(comment.created)}"></td>
+            <td th:text="${comment.ip}"></td>
+            <td th:text="${comment.content}"></td>
+            <td th:text="${comment.author}"></td>
+            <td>
+                <a class="btn btn-danger" href="javascript:void(0)" th:onclick="delComment([[${comment.id}]],[[${comment.articleId}]])">删除</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+            <!--                    如果有前一页-->
+            <th:block th:if="${comments.hasPreviousPage}">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{'?page='+${comments.prePage}}" aria-label="Previous"
+                       style="background-color: #333;">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+            </th:block>
+            <!--                    没有前一页-->
+            <th:block th:unless="${comments.hasPreviousPage}">
+                <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous" style="background-color: #333;">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </span>
+                </li>
+            </th:block>
+
+            <th:block th:each="pageNum:${comments.navigatepageNums}">
+                <th:block th:if="${comments.pages}<=5">
+                    <li th:class="${comments.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                </th:block>
+                <th:block th:if="${comments.pages}>5">
+                    <li th:if="${comments.pageNum<=3 && pageNum<=5}"
+                        th:class="${comments.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                    <li th:if="${comments.pageNum >= comments.pages-2 && pageNum > comments.pages-5}"
+                        th:class="${comments.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                    <li th:if="${comments.pageNum >=4 && comments.pageNum <= comments.pages-3 &&  pageNum >= comments.pageNum-2 && pageNum <= comments.pageNum+2}"
+                        th:class="${comments.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                </th:block>
+            </th:block>
+
+
+            <th:block th:if="${comments.hasNextPage}">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{'?page='+${comments.nextPage}}" aria-label="Next"
+                       style="background-color: #333;">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </th:block>
+            <th:block th:unless="${comments.hasNextPage}">
+                <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next" style="background-color: #333;">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </span>
+                </li>
+            </th:block>
+            <li>&nbsp;&nbsp;<span style="color: #bfe2e9;font-size: 20px;font-weight: bold"
+                                  th:text="'共'+${comments.pages}+'页'"></span></li>
+        </ul>
+    </nav>
+</main>
+
+<div th:replace="user/common::footer"></div>
+
+<script>
+    function delComment(id,aid) {
+        console.log(id)
+        console.log(aid)
+        if (confirm('确定删除该评论吗?')) {
+            $.ajax({
+                type: 'post',
+                url: '/admin/deleteComment',
+                data: {id: id,aid: aid},
+                dataType: 'json',
+                success: function (result) {
+                    if (result && result.success) {
+                        window.alert("删除成功");
+                        window.location.reload();
+                    } else {
+                        window.alert(result.msg || '删除失败');
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+<script src="/js/bootstrap.bundle.js"></script>
+<script src="/js/jquery.min.js"></script>
+</body>
+</html>

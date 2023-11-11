@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="title='首页', active='home'">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心界面</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+        body{
+            background-image: url('/img/bj.jpg');
+        }
+        a{
+            color: #c7dbd2;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+        a:hover{
+            color: orange;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="user/common::header(title=${title},active=${active})"></div>
+
+
+<main class="container mt-5">
+    <div class="content-page">
+        <div class="content">
+            <div class="container">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <h4 class="page-title" style="color: #dfc2c4;">信息总汇</h4>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body">
+                                <span class="card-icon"><i class="fa fa-quote-right" aria-hidden="true"></i></span>
+                                <div class="card-info text-right">
+                                    发表了<span style="color: #bfe2e9;" class="counter" th:text="${statistics.articles}"></span>篇文章
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-dark text-light">
+                            <div class="card-body">
+                                <span class="card-icon"><i class="fa fa-comments-o" aria-hidden="true"></i></span>
+                                <div class="card-info text-right">
+                                    收到了<span style="color: #bfe2e9;" class="counter" th:text="${statistics.comments}"></span>条留言
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card" style="background: rgba(0,0,0,0.3)">
+                            <div class="card-header">
+                                <h4 class="card-title" style="color: #dfc2c4;">最新发表文章</h4>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group">
+                                    <li class="list-group-item" th:each="article : ${articles}"  style="background: rgba(92, 99, 106, 0.4)">
+                                        <span class="badge badge-primary" th:text="${article.commentsNum}"></span>
+                                        <a th:href="${commons.site_url('/article/')}+${article.id}"
+                                           th:text="${article.title}"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card" style="background: rgba(0,0,0,0.5)">
+                            <div class="card-header">
+                                <h4 class="card-title" style="color: #dfc2c4;">最新收到留言</h4>
+                            </div>
+                            <div class="card-body">
+                                <div th:if="${comments.size()}==0" class="alert alert-warning">
+                                    还没有收到留言.
+                                </div>
+                                <ul class="list-group" th:unless="${comments}==null and ${comments.size()}==0">
+                                    <li class="list-group-item" th:each="comment : ${comments}" style="background: rgba(92, 99, 106, 0.4)">
+                                        <span style="color: #e6dbb9" th:text="${comment.author}" class="mr-2"></span>
+                                        <span style="color: #e6dbb9">于</span>
+                                        <span style="color: #e6dbb9" th:text="${commons.dateFormat(comment.created)}" class="mr-2"></span>
+                                        <span style="color: #e6dbb9">在</span>
+                                        <span style="color: #e6dbb9" th:text="${comment.title}" class="mr-2"></span>
+                                        <span style="color: #e6dbb9">:</span>
+                                        <a th:href="${commons.site_url('/article/')}+${comment.id}+'#comments'"
+                                           th:utext="${commons.article(comment.content)}"></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<div th:replace="user/common::footer"></div>
+
+<script src="/js/bootstrap.bundle.js"></script>
+</body>
+</html>
