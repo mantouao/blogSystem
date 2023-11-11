@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:with="title='文章管理',active='article'">
+<head>
+    <meta charset="UTF-8">
+    <title>文章管理</title>
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-image: url('/img/bj.jpg');
+        }
+
+        a {
+            color: #c7dbd2;
+            transition: color 0.3s;
+            text-decoration: none;
+        }
+
+        a:hover {
+            color: orange;
+        }
+
+        .odd-row {
+            color: #e6dbb9;
+            background-color: rgba(128, 128, 128, 0.3);
+        }
+
+        .even-row {
+            color: #ffe69c;
+            background-color: rgba(0, 0, 0, 0.3);
+        }
+    </style>
+</head>
+<body>
+<div th:replace="user/common::header(title=${title},active=${active})"></div>
+
+
+<main class="container mt-5">
+    <div class="col-sm-12">
+        <h4 class="page-title" style="color: #dfc2c4;">文章管理</h4>
+    </div>
+
+    <table class="table" style="background: rgba(0,0,0,0.3)">
+        <thead style="color: #dfc2c4;">
+        <tr>
+            <th>文章标题</th>
+            <th>发布时间</th>
+            <th>浏览量</th>
+            <th>评论量</th>
+            <th>分类</th>
+            <th>操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        <!-- 使用Thymeleaf循环遍历文章数据并生成表格行 -->
+        <tr th:each="article, rowStatus : ${articles.list}" th:class="${rowStatus.even}? 'even-row' : 'odd-row'">
+            <td th:text="${article.title}"></td>
+            <td th:text="${commons.dateFormat(article.created)}"></td>
+            <td th:text="${article.hits}"></td>
+            <td th:text="${article.commentsNum}"></td>
+            <td th:text="${article.categories}"></td>
+            <td>
+                <!-- 添加操作按钮，例如编辑和删除 -->
+                <a class="btn btn-primary" th:href="@{'/user/toUpdate/'+${article.id}}">编辑</a>
+                <a class="btn btn-danger" href="javascript:void(0)" th:onclick="delArticle([[${article.id}]])">删除</a>
+                <a class="btn btn-success" th:href="@{'/article/'+${article.id}}">预览</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+    <nav aria-label="...">
+        <ul class="pagination justify-content-center">
+            <!--                    如果有前一页-->
+            <th:block th:if="${articles.hasPreviousPage}">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{'?page='+${articles.prePage}}" aria-label="Previous"
+                       style="background-color: #333;">
+                        <span aria-hidden="true">&laquo;</span>
+                        <span class="sr-only">Previous</span>
+                    </a>
+                </li>
+            </th:block>
+            <!--                    没有前一页-->
+            <th:block th:unless="${articles.hasPreviousPage}">
+                <li class="page-item disabled">
+                            <span class="page-link" aria-label="Previous" style="background-color: #333;">
+                                <span aria-hidden="true">&laquo;</span>
+                                <span class="sr-only">Previous</span>
+                            </span>
+                </li>
+            </th:block>
+
+            <th:block th:each="pageNum:${articles.navigatepageNums}">
+                <th:block th:if="${articles.pages}<=5">
+                    <li th:class="${articles.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                </th:block>
+                <th:block th:if="${articles.pages}>5">
+                    <li th:if="${articles.pageNum<=3 && pageNum<=5}"
+                        th:class="${articles.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                    <li th:if="${articles.pageNum >= articles.pages-2 && pageNum > articles.pages-5}"
+                        th:class="${articles.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                    <li th:if="${articles.pageNum >=4 && articles.pageNum <= articles.pages-3 &&  pageNum >= articles.pageNum-2 && pageNum <= articles.pageNum+2}"
+                        th:class="${articles.pageNum}==${pageNum}?'active':''">
+                        <a style="background-color: #333;" class="page-link" th:href="@{'?page='+${pageNum}}"
+                           th:text="${pageNum}"></a>
+                    </li>
+                </th:block>
+            </th:block>
+
+
+            <th:block th:if="${articles.hasNextPage}">
+                <li class="page-item">
+                    <a class="page-link" th:href="@{'?page='+${articles.nextPage}}" aria-label="Next"
+                       style="background-color: #333;">
+                        <span aria-hidden="true">&raquo;</span>
+                        <span class="sr-only">Next</span>
+                    </a>
+                </li>
+            </th:block>
+            <th:block th:unless="${articles.hasNextPage}">
+                <li class="page-item disabled">
+                            <span class="page-link" aria-label="Next" style="background-color: #333;">
+                                <span aria-hidden="true">&raquo;</span>
+                                <span class="sr-only">Next</span>
+                            </span>
+                </li>
+            </th:block>
+            <li>&nbsp;&nbsp;<span style="color: #bfe2e9;font-size: 20px;font-weight: bold"
+                                  th:text="'共'+${articles.pages}+'页'"></span></li>
+        </ul>
+    </nav>
+</main>
+
+<div th:replace="user/common::footer"></div>
+
+<script>
+    function delArticle(id) {
+        console.log(id)
+        if (confirm('确定删除该文章吗?')) {
+            $.ajax({
+                type: 'post',
+                url: '/user/delete',
+                data: {id: id},
+                dataType: 'json',
+                success: function (result) {
+                    if (result && result.success) {
+                        window.alert("文章删除成功");
+                        window.location.reload();
+                    } else {
+                        window.alert(result.msg || '文章删除失败');
+                    }
+                }
+            });
+        }
+    }
+</script>
+
+<script src="/js/bootstrap.bundle.js"></script>
+<script src="/js/jquery.min.js"></script>
+</body>
+</html>

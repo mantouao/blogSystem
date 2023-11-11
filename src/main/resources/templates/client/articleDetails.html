@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <meta charset="UTF-8">
+    <title>文章页面</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <script src="/js/code.jquery.com_jquery-3.7.0.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f8f8;
+            color: #CCCCCC;
+            margin: 0;
+            padding: 0;
+            background-image: url("/img/bj.jpg");
+            background-color: rgba(0, 0, 0, 0.5); /* 设置背景色，其中最后一个参数是透明度 */
+            background-blend-mode: overlay;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        .border-container {
+            border: 2px inset #ccc; /* 边框样式和颜色 */
+            border-radius: 10px; /* 边框圆角 */
+            padding: 10px; /* 内边距 */
+        }
+    </style>
+</head>
+<body>
+<div th:replace="~{client/common::topbar}"></div>
+<article>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2 border-container">
+                <div class="post-header">
+                    <h1  style="text-align: center;color: #dfc2c4" class="post-title" itemprop="name headline" th:text="${article.title}"></h1>
+                    <a type="button" class="btn btn-outline-danger" onclick="javascript:history.back(1)"><</a>
+
+                    <hr>
+                    <div class="post-data">
+                        <time class="text-muted" th:datetime="${commons.dateFormat(article.created)}" itemprop="datePublished" th:text="'发布于 ' + ${commons.dateFormat(article.created)}" style="color: #bcd0c7 !important;"></time>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        作者:<span style="font-size: 15px;color: #bfe2e9" th:text="${article.author}">作者</span>
+                    </div>
+                </div>
+                <br/>
+                <div id="post-content" class="post-content content" th:utext="${commons.article(article.content)}"></div>
+            </div>
+        </div>
+    </div>
+</article>
+<div th:replace="~{client/comments::comments}"></div>
+<!-- 使用layer.js实现图片缩放功能 -->
+<script type="text/JavaScript">
+    $('.post-content img').on('click', function(){
+        var imgurl=$(this).attr('src');
+        var w=this.width*2;
+        var h=this.height*2+50;
+        layer.open({
+            type: 1,
+            title: false, //不显示标题栏
+            area: [w+"px", h+"px"],
+            shadeClose: true, //点击遮罩关闭
+            content: '\<\div style="padding:20px;">' +
+                '\<\img style="width:'+(w-50)+'px;" src='+imgurl+'\>\<\/div>'
+        });
+    });
+    (function () {
+        window.TaleComment = {
+            subComment: function () {
+                $.ajax({
+                    type: 'post',
+                    url: '/comments/publish',
+                    data: $('#comment-form').serialize(),
+                    async: false,
+                    dataType: 'json',
+                    success: function (result) {
+                        if (result && result.success) {
+                            window.alert("评论提交成功!");
+                            window.location.reload();
+                        } else {
+                            window.alert("发送失败")
+                            if (result.msg) {
+                                alert(result.msg);
+                            }
+                        }
+                    }
+                });
+                return false;
+            }
+        };
+    })();
+    function addMention(username) {
+        var textarea = document.getElementById('textarea');
+        console.log(username);
+        textarea.value += '@'+username;
+    }
+</script>
+</body>
+</html>
