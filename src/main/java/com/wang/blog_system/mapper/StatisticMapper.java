@@ -34,11 +34,11 @@ public interface StatisticMapper {
     public List<Statistic> getStatistic();
 
 //    总热度
-    @Select("select sum(hits) from t_statistic")
-    public long getTotalHit();
+    @Select("select sum(hits) from t_statistic,t_article where t_statistic.article_id = t_article.id and author = #{author}")
+    public long getTotalHitByAuthor(String author);
 
 //    总评论数
-    @Select("select sum(comments_num) from t_statistic")
-    public long getTotalComment();
+    @Select("select sum(comments_num) from t_statistic,t_article where t_statistic.article_id = t_article.id and author = #{author}")
+    public long getTotalCommentByAuthor(String author);
 
 }

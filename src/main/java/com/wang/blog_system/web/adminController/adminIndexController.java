@@ -55,7 +55,7 @@ public class adminIndexController {
     }
 
     @RequestMapping("/admin/delete")
-    public ResponseEntity<Object> delete(@RequestParam String id, String username) {
+    public synchronized ResponseEntity<Object> delete(@RequestParam String id, String username) {
         int Did = Integer.parseInt(id);
         try {
             userServiceImp.deleteUser(Did, username);
@@ -72,7 +72,7 @@ public class adminIndexController {
         return "back/commentsManagement";
     }
     @RequestMapping("/admin/deleteComment")
-    public ResponseEntity<Object> deleteComment(@RequestParam String id, String aid) {
+    public synchronized ResponseEntity<Object> deleteComment(@RequestParam String id, String aid) {
         int Did = Integer.parseInt(id);
         int Aid = Integer.parseInt(aid);
         try {

@@ -20,6 +20,6 @@ pagehelper:
   reasonable: true
   support-methods-arguments: true
   params: count=countSql
-#cookie:
-#  validity: 1800
+COOKIE:
+  VALIDITY: 1800
 

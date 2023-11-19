@@ -21,7 +21,7 @@ public class ShiroConfig {
         shiroFilterFactoryBean.setSecurityManager(defaultWebSecurityManager);
         LinkedHashMap<String, String> filterMap = new LinkedHashMap<>();
 
-        filterMap.put("/article/*","authc");
+        filterMap.put("/article/**","authc");
         filterMap.put("/logout","logout");
 
 

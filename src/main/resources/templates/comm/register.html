@@ -9,27 +9,62 @@
         <meta name="apple-touch-fullscreen" content="yes">
         <meta http-equiv="Access-Control-Allow-Origin" content="*">
         <link href="/css/register.css" type="text/css" rel="stylesheet">
-        <link href="/css/global.css" type="text/css" rel="stylesheet">
-        <script type="text/javascript" src="/js/register.js"></script>
+        <link href="/css/bootstrap.min.css" type="text/css" rel="stylesheet">
     </head>
     <body style="background-image: url('/img/15.png')">
-        <div id="layout">
-            <span>博客账号注册</span>
-            <form th:action="@{/register}" method="post">
+    <div id="layout">
+        <span>博客账号注册</span>
+        <form th:action="@{/register}" method="post">
             <ul>
                 <p id="err_msg" th:text="${msg}"></p>
-                <li><input type="hidden" name="role" th:value="${role}"></li>
+                <li><input type="hidden" name="role" th:value="${role}" /></li>
                 <li><i class="un"><img src="/img/user_name.png"></i><input name="username" class="username" type="text" placeholder="请输入用户名" /></li>
-                <li><i class="yz"><img src="/img/msg.png"></i><input name="email" class="yzm" type="text" placeholder="请输入邮箱" /></li>
                 <li><i class="pw"><img src="/img/pwd.png"></i><input name="password" class="pwd" type="password" placeholder="请输入密码" /></li>
                 <li><i class="pw2"><img src="/img/pwd.png"></i><input class="pwd2" type="password" placeholder="请输入确认密码" /></li>
-                <div class="queren"><input class="fx" type="checkbox" checked="checked" /><p style="color: white">我已阅读并同意《用户协议》</p></div>
-            </ul>
-                <div class="reg_btn">
-                    <button class="submit" type="submit">注册</button>
-                    <a th:href="@{/toLogin}"><div class="reg-login"><p>已有帐号，立即登陆</p></div></a>
+                <li><i class="yz"><img src="/img/msg.png"></i><input id="email" name="email" class="yzm" type="text" placeholder="请输入邮箱" /><button id="emailbtn" name="emailbtn" type="button" class="btn btn-success">获取验证码</button></li>
+                <li>
+                    <i class="verify"><img src="/img/msg.png"></i>
+                    <input name="verificationCode" class="verify" type="text" placeholder="请输入验证码" />
+                </li>
+                <div class="queren">
+                    <input class="fx" type="checkbox" checked="checked" />
+                    <p style="color: white">我已阅读并同意《用户协议》</p>
                 </div>
-            </form>
-        </div>
+            </ul>
+            <div class="reg_btn">
+                <button class="submit" type="submit">注册</button>
+                <a th:href="@{/login}">
+                    <div class="reg-login"><p>已有帐号，立即登陆</p></div>
+                </a>
+            </div>
+        </form>
+    </div>
+    <script src="/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/js/register.js"></script>
+    <script type="text/javascript" src="/js/bootstrap.bundle.js"></script>
+    <script>
+        $(function() {
+            $("#emailbtn").click(function(event) {
+                event.preventDefault();
+                let email = $("#email").val();
+
+                // 邮箱格式验证
+                var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email)) {
+                    alert("请输入有效的邮箱地址");
+                    return;
+                }
+
+                $.ajax({
+                    url: '/sentEmail?email=' + email,
+                    method: 'GET',
+                    success: function(res) {
+                        console.log(res);
+                        alert(res);
+                    }
+                });
+            });
+        });
+    </script>
     </body>
 </html>

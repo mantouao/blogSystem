@@ -38,4 +38,6 @@ public interface UserMapper {
 //    删除用户
     @Delete("delete from t_user where id = #{id}")
     public void delete(Integer id);
+    @Select("select DISTINCT t_user.email,t_user.username from t_article, t_user where t_article.author = t_user.username")
+    public List<User> selectAll();
 }

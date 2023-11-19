@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>文章</title>
     <link rel="stylesheet" href="/css/bootstrap.min.css">
-
+    <link rel="stylesheet" href="/markdownUtil/css/editormd.min.css">
     <style>
         body {
             background-image: url('/img/bj.jpg');
@@ -28,6 +28,7 @@
 </head>
 <body>
 <script src="/js/jquery.min.js"></script>
+<script src="/markdownUtil/editormd.min.js"></script>
 <div th:replace="user/common::header(title=${title},active=${active})"></div>
 
 <div class="container">
@@ -106,8 +107,8 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="form-group">
+                <br>
+                <div class="form-group" id="md-content">
                     <label for="content" style="color: #ffe69c">文章内容:</label>
                     <textarea class="form-control  custom-scroll" id="content" name="content" rows="8"
                               style="resize: none;background: rgba(255,255,255,0.5)"
@@ -149,6 +150,15 @@
             }
         });
     }
+
+    $(function (){
+        var editor = editormd("md-content",{
+            width : "100%",
+            height : 500,
+            syncScrolling: "single",
+            path : "/markdownUtil/lib/"
+        })
+    })
 </script>
 <script src="/js/bootstrap.bundle.js"></script>
 </body>

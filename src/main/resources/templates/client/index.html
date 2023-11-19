@@ -185,16 +185,17 @@
         <!-- 博主信息描述 -->
         <div class="col-md-4 col-sm-12 blog-sidebar">
             <div class="blog-sidebar-widget blog-bor">
-                <h2 class="blog-text-center blog-title"><span>个人博客❥</span></h2>
+                <h2 class="blog-text-center blog-title"><span>博客猿❥</span></h2>
                 <img class="img-fluid" th:src="@{/img/touxiang.png}" alt="about me">
                 <p>Java后台开发</p>
-                <p>个人博客小站，主要发表关于Java、Spring、Docker等相关文章</p>
+                <p>小型博客，讨论技术，讨论问题</p>
             </div>
             <div class="blog-sidebar-widget blog-bor">
                 <h2 class="blog-text-center blog-title"><span>联系我</span></h2>
                 <p>
                     <a href="https://github.com/mantouao" target="_blank"><span class="fab fa-github blog-icon"></span></a>
-                    <a href="https://gitee.com/mantouwowotou" target="_blank"><span class="fab fa-gitee blog-icon"></span></a>
+                    &nbsp;
+                    <a href="https://gitee.com/mantouwowotou" target="_blank"><span class="fab blog-icon">gitee</span></a>
                 </p>
             </div>
 
@@ -215,6 +216,8 @@
 
     </div>
 </div>
+<script src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/click_show_text.js"></script>
 <script>
     window.addEventListener('scroll', function() {
         var navbar = document.querySelector('.navbar');

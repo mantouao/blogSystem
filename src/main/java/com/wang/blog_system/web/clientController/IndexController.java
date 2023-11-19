@@ -9,6 +9,7 @@ import com.wang.blog_system.service.ArticleService;
 import com.wang.blog_system.service.CommentService;
 import com.wang.blog_system.service.SiteService;
 import com.wang.blog_system.service.UserService;
+import com.wang.blog_system.utils.MailUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -28,10 +29,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import javax.servlet.http.HttpSession;
+import java.util.*;
 
 @Controller
 public class IndexController {
@@ -44,6 +43,8 @@ public class IndexController {
     private SiteService siteServiceImp;
     @Autowired
     private UserService userServiceImp;
+    @Autowired
+    private MailUtils mailUtils;
 
     @GetMapping("/")
     private String index(Model model) {
@@ -133,7 +134,12 @@ public class IndexController {
         return "comm/register";
     }
     @RequestMapping("/register")
-    public String register(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("email") String email, String role, Model model){
+    public String register(@RequestParam("username") String username, @RequestParam("password") String password, @RequestParam("email") String email, String role, String verificationCode, Model model, HttpSession session){
+        String code = (String) session.getAttribute("code");
+        if(!Objects.equals(code,verificationCode)){
+            model.addAttribute("msg","验证码错误");
+            return "comm/register";
+        }
         String algorithmName = "MD5";
         int hashIterations = 1024;
         String salt = RandomStringUtils.random(5,true,false);
@@ -173,5 +179,15 @@ public class IndexController {
     @RequestMapping("/toError403")
     public String toError430(){
         return "error/403";
+    }
+
+    @RequestMapping("/sentEmail")
+    public String sentEmail(String email, HttpSession session){
+//        验证码
+        String code = RandomStringUtils.random(5,true,true);
+        session.setAttribute("code",code);
+//        发送邮箱
+        mailUtils.sentVerify(email,"博客园用户注册","您的验证码为: "+code+",如果您没有请求此代码，切勿泄露给他人");
+        return code;
     }
 }
